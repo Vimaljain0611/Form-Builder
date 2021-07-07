@@ -1,0 +1,19 @@
+#formDiv{
+  background: #d8d8d8;
+  margin: 20px;
+  padding: 11px;
+}
+
+.row{
+  padding: 0px 40px;
+  margin-bottom: 7px;
+}
+.btn{
+  width: 100%;
+}
+label{
+  margin-left: 5px;
+  padding: 6px 12px;
+  font-size: 15px;
+  font-weight: 700;
+}
