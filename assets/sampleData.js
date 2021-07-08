@@ -2,57 +2,92 @@
 class Form {
   setDropDownOptions;
   formId;
-  //mainClass;
-  constructor(formId) {
+  formView;
+
+  constructor(formId,mainClass) {
+
     this.formId = formId;
     this.init();
+     this.mainClass = mainClass;
+
+    this.formView = document.getElementById("formDiv");
+    this.formView.appendChild(this.getFormRow(mainClass,this));
+
   }
 
   init() {
     this.setDropDownOptions = [
-      { innerHTML: "Text", value: "text" },
-      { innerHTML: "Number", value: "number" },
-      { innerHTML: "Date", value: "date" },
-      { innerHTML: "Range", value: "range" },
-      { innerHTML: "Email", value: "email" },
-      { innerHTML: "Color", value: "color" },
+      { innerText: "Text", value: "text" },
+      { innerText: "Number", value: "number" },
+      { innerText: "Date", value: "date" },
+      { innerText: "Range", value: "range" },
+      { innerText: "Email", value: "email" },
+      { innerText: "Color", value: "color" },
     ];
   }
 
+  //add row
+  addNewRow(form){
+    if(form.elements[0].value)
+    {
+      this.formView.appendChild(this.createRow(form.elements[0].value ,form.elements[1].value,'',this.mainClass));
+      form.elements[0].value = "";
+    }else{
+       alert("Enter Label to add ");
+    }
+   }
+
+   setRowsOnLoad(data,mainClass){
+
+    data.forEach((data) => {
+        this.formView.appendChild(this.createRow(data.label,data.inputType,data.value));
+    });
+   }
+
+   // to avoid duplication of the label
+  checkForLabel(labelName){
+    const allLabels = [...this.formView.getElementsByTagName('label')];
+    const isLabelAvailable = allLabels.find((label) => (label.innerText == labelName.value));
+    if(isLabelAvailable)
+    {
+      alert('Label Must be Unique');
+      labelName.value = '';
+    }
+  }
+
+
    //create thead
-  getFormRow(mainClass) {
+  getFormRow(mainClass,formClass) {
     const form = document.createElement("form");
     form.id = this.formId;
     const row = document.createElement("div");
     row.className = "row";
 
-    row.appendChild(this.createEle("input", "text",'','','add'));
+    row.appendChild(this.createEle("input", "text",'','','add',formClass));
 
-    let selectCol = document.createElement("div");
+    const selectCol = document.createElement("div");
     selectCol.className = "col-md-3";
-
     const dropDown = document.createElement("select");
-    dropDown.className = "form-control";
+    dropDown.className = "input";
     this.setDropDownOptions.forEach((opt) => {
       const optNode = document.createElement("option");
       optNode.value = opt.value;
-      optNode.innerHTML = opt.innerHTML;
+      optNode.innerText = opt.innerText;
       return dropDown.appendChild(optNode);
     });
     selectCol.appendChild(dropDown);
     row.appendChild(selectCol);
 
-
     const addFunction = function (e) {
       e.preventDefault();
-      mainClass.addRow(this.form);
-    };
+
+      formClass.addNewRow(this.form); };
     row.appendChild(this.createButton("Add", addFunction));
 
     //remove button
     const refreshFunction = function (e) {
       e.preventDefault();
-      mainClass.Refresh();
+      mainClass.refresh();
     };
     row.appendChild(this.createButton("Refresh", refreshFunction));
 
@@ -61,7 +96,7 @@ class Form {
   }
 
   //creating
-  createRow(label, type,value, mainClass) {
+  createRow(label, type,value,mainClass) {
     const row = document.createElement("div");
     row.className = "row";
 
@@ -72,38 +107,37 @@ class Form {
     //save button
     const addFunction = function (e) {
       e.preventDefault();
-      mainClass.insertData(label,type,this.parentNode.previousSibling.childNodes[0].value);
+
+      mainClass.insertSingleRowInStorage(label,type,this.parentNode.previousSibling.childNodes[0].value);
     };
     row.appendChild(this.createButton("Save", addFunction));
 
     //remove button
-    const refreshFunction = function (e) {
+    const removeFunction = function (e) {
       e.preventDefault();
-      mainClass.deleteData(label);
+      mainClass.deleteSingleRowFromStorage(label);
       this.parentNode.parentNode.parentNode.removeChild(this.parentNode.parentNode);
     };
-    row.appendChild(this.createButton("Remove", refreshFunction));
+    row.appendChild(this.createButton("Remove", removeFunction));
 
     return row;
   }
 
   //create elements
-  createEle(Elem, type, text,value,add) {
-
+  createEle(Elem, type, text,value,add,formClass) {
     const divCol = document.createElement("div");
     divCol.className = "col-md-3";
     const input = document.createElement(Elem);
     if (Elem != "label") {
-      input.className = "form-control";
+      input.className = "input";
     }
     input.type = type;
     input.value = value;
     input.textContent = text;
 
-    if(add !== '')
-    {
+    if(add){
       input.addEventListener('blur', function(e){
-        mainClass.checkForLabel(this);
+        formClass.checkForLabel(this);
       });
     }
 
@@ -113,18 +147,14 @@ class Form {
 
   //create buttons
   createButton(label, btnFunction) {
-    let addBtnCol = document.createElement("div");
+    const addBtnCol = document.createElement("div");
     addBtnCol.className = "col-md-3";
     const btn = document.createElement("button");
     btn.textContent = label;
     btn.onclick = btnFunction;
-    btn.className = "btn btn-primary";
+    btn.className = "btn";
     addBtnCol.appendChild(btn);
 
     return addBtnCol;
   }
-
-
 }
-
-
