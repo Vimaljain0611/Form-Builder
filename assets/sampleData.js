@@ -6,7 +6,6 @@ class Form {
   checkBoxDropdown;
   checkBoxOption;
   formClass;
-  checkedRowList =[];
 
   constructor(formId,mainClass) {
     this.formId = formId;
@@ -127,12 +126,18 @@ class Form {
 
   //add row
   addNewRow(form){
-
+    //console.log(form.elements[0].type)
     if(form.elements[1].value)
     {
-      if(form.elements[1].value == 'Checkbox'){
-        this.formView.appendChild(this.createRow(form.elements[1].value ,form.elements[2].value,form.elements[4].value,this.mainClass,this));
-        form.elements[1].value = "";
+      if(form.elements[2].value == 'Checkbox'){
+        if(form.elements[6].value != 'select')
+        {
+          this.formView.appendChild(this.createRow(form.elements[1].value ,form.elements[2].value,form.elements[6].value,this.mainClass,this));
+          form.elements[1].value = "";
+        }else{
+          alert('Select Checkbox option')
+        }
+
       }else{
         this.formView.appendChild(this.createRow(form.elements[1].value ,form.elements[2].value,'',this.mainClass,this));
         form.elements[1].value = "";
@@ -193,7 +198,7 @@ class Form {
     //save button
     const addFunction = function (e) {
       e.preventDefault();
-      let value ='';
+      var value ='';
       if(type == 'Checkbox')
       {
         value =  (this.parentNode.previousSibling.childNodes[0].checked == true) ? 'yes' : 'no' ;
@@ -245,10 +250,10 @@ class Form {
     addBtnCol.className = "col-3";
     const btn = document.createElement("button");
     btn.textContent = label;
-    // if(label == 'Delete')
-    // {
-    //   this.deleteButton= this;
-    // }
+    if(btn.textContent == 'Delete')
+    {
+      btn.style.display = 'none';
+    }
     btn.onclick = btnFunction;
     btn.className = "btn";
     addBtnCol.appendChild(btn);
@@ -260,48 +265,55 @@ class Form {
       checkBoxDiv.className = "col-1";
       const checkBox = document.createElement("input");
       checkBox.type='checkbox';
-
+      let buttonTags =[...document.getElementsByTagName("button")];
+      let deleteButton = buttonTags.find((label) => (label.innerText == 'Delete'));
       if(allCheck)
       {
         checkBox.className ='sideMainCheckbox';
         checkBox.addEventListener( 'change', function() {
           const allCheckedBox = [...formView.getElementsByClassName('sideCheckbox')];
+          let buttonTags =[...document.getElementsByTagName("button")];
+          let deleteButton = buttonTags.find((label) => (label.innerText == 'Delete'));
           if(this.checked){
             allCheckedBox.forEach((checkValue) =>{ checkValue.checked = 'checked';  });
+            deleteButton.style.display = 'block';
           }else{
             allCheckedBox.forEach((checkValue) =>{ checkValue.checked = ''; });
+            deleteButton.style.display = 'none';
           }
          });
       }else{
-
         checkBox.className ='sideCheckbox';
         checkBox.addEventListener( 'change', function() {
           const formView = this.parentNode.parentNode.parentNode;
           const CheckedBox = [...formView.getElementsByClassName('sideCheckbox')];
-          const isAnyChecked  = CheckedBox.every((checkValue) =>(checkValue.checked));
+          const isAnyChecked  = CheckedBox.every((checkValue) =>(checkValue.checked) );
+          const isSomeChecked  = CheckedBox.find((checkValue) =>(checkValue.checked) );
           const checked = [...formView.getElementsByClassName('sideMainCheckbox')];
           (isAnyChecked) ? checked[0].checked ='checked': checked[0].checked = '';
+          (isSomeChecked) ? deleteButton.style.display = 'block':deleteButton.style.display = 'none';
         });
-
       }
-      //checkBox.addEventListener( 'change', function() {  ;(this.checked) ? formClass.checkedRowListPush(checkBox.parentNode.parentNode) : formClass.checkedRowListPop(checkBox.parentNode.parentNode) });
       checkBoxDiv.appendChild(checkBox);
       return checkBoxDiv;
     }
 
     deleteSelected(mainClass){
       const allCheckedBox = [...this.formView.getElementsByClassName('sideCheckbox')];
+      const buttonTags =[...document.getElementsByTagName("button")];
+      const deleteButton = buttonTags.find((label) => (label.innerText == 'Delete'));
       allCheckedBox.forEach((checkValue,index) =>{
         const isRowAvailable = checkValue.checked;
           if(isRowAvailable)
           {
-            if(index != 0){
-            const node = allCheckedBox[index].parentNode.parentNode;
-            const labelNode = [...node.getElementsByClassName('label')];
-            mainClass.deleteSingleRowFromStorage(labelNode[0].innerText);
-            this.formView.removeChild(allCheckedBox[index].parentNode.parentNode)
-            }
+              const node = allCheckedBox[index].parentNode.parentNode;
+              const labelNode = [...node.getElementsByClassName('label')];
+              mainClass.deleteSingleRowFromStorage(labelNode[0].innerText);
+              this.formView.removeChild(allCheckedBox[index].parentNode.parentNode)
           }
+          const mainChecked = [...this.formView.getElementsByClassName('sideMainCheckbox')];
+          mainChecked[0].checked ='';
+          deleteButton.style.display = 'none';
       });
     }
 
