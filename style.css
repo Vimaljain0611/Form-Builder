@@ -82,7 +82,7 @@ button:hover{
 }
 .col-3
 {
-  width: 18%;
+  width: 17%;
   position: relative;
   float: left;
   margin: 0px 6px;
@@ -113,7 +113,8 @@ input[type="Checkbox"]
   height: 22px;
 }
 .checkboxSelect{
-  margin-left: 23.5%;
+  margin-left: 26%;
+  margin-top: 10px;
 }
 .sideMainCheckbox{
   width: 21px;
@@ -123,4 +124,19 @@ input[type="Checkbox"]
 {
   width: 21px;
   height: 26px !important;
+}
+i{
+  height: 12px;
+  padding: 9px;
+  border: 2px double white;
+  border-radius: 18px;
+}
+i:hover
+{
+  cursor: pointer;
+}
+.childDiv
+{
+  margin-left: 8%;
+
 }
